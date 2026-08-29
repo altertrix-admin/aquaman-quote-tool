@@ -166,7 +166,7 @@ const I18N = {
     ownerOverride: 'Owner Override', tempNoLogin: '(temporary, no real login)',
     enableOverride: (min)=>`Enable override to quote fewer than ${min} vehicles as fleet`,
     authorizedBy: 'Authorized by (José or Juan)', reason: 'Reason', reasonPh: 'Why this fleet quote needs fewer vehicles',
-    tax: 'Tax', taxRate: 'Sales Tax Rate (%)', taxRatePh: 'e.g. 9.75',
+    tax: 'Tax', includeTax: 'Include Tax (9.5%)',
     taxExempt: 'Tax Exempt — Resale (dealer)',
     exemptNote: "Only apply this if the dealer's resale certification (license # verified + resale confirmation) is signed and on file. Not automatic — you confirm this before sending.",
     manualDiscount: 'Manual Discount ($)',
@@ -174,7 +174,7 @@ const I18N = {
     salesTax: 'Sales Tax', exempt: '(Exempt)', total: 'Total',
     boatNoCalc: 'No pricing to calculate. Save or send this quote as a "Contact us for availability" note.',
     savedQuotes: 'Saved Quotes', shared: '(shared)', noSaved: 'No saved quotes yet.',
-    save: 'Save', pdf: 'PDF', email: 'Email',
+    save: 'Save', pdf: 'PDF', email: 'Send',
     selectAuthorFirst: 'Please select who created this quote (José or Juan) before saving.',
     selectAuthorFirst2: 'Please select who created this quote (José or Juan) first.',
     belowMinBlock: (min)=>`This fleet quote has fewer than ${min} approved vehicles. Enable and complete Owner Override, or approve more vehicles, before continuing.`,
@@ -188,8 +188,12 @@ const I18N = {
     boatContact: 'Boat Wash — Contact us for availability. Pricing provided upon request.',
     footnote: 'Appointments are confirmed based on availability. Submitting or receiving this estimate does not reserve an appointment.',
     exemptResale: '(Exempt — Resale)',
-    emailIntro: (name)=>`Please find attached your detailing estimate from Aquaman Services${name?', '+name:''}.`,
-    emailIntroNoAttach: (name)=>`Here is your detailing estimate from Aquaman Services${name?', '+name:''}. (Your browser could not auto-attach the PDF — please attach the file that was just downloaded.)`,
+    emailSubject: 'Estimate - Aquaman Services (Car Wash Detailing)',
+    emailGreeting: (name)=> name ? `Hello ${name},` : 'Hello,',
+    emailBody1: 'Please find attached the estimate you requested for your vehicle\'s car wash detailing with Aquaman Services.',
+    emailBody2: 'If you have any questions or would like to schedule the service, feel free to reach out.',
+    emailClosing: 'Thank you,',
+    emailNoAttachNote: '(Your browser could not auto-attach the PDF — please attach the file that was just downloaded.)',
     pdfShareTitle: 'Aquaman Services Estimate',
   },
   es: {
@@ -214,7 +218,7 @@ const I18N = {
     ownerOverride: 'Owner Override', tempNoLogin: '(temporal, sin login real)',
     enableOverride: (min)=>`Activar excepción para cotizar menos de ${min} vehículos como flota`,
     authorizedBy: 'Autorizado por (José o Juan)', reason: 'Razón', reasonPh: 'Por qué esta cotización de flota necesita menos vehículos',
-    tax: 'Impuesto', taxRate: 'Tasa de Impuesto (%)', taxRatePh: 'ej. 9.75',
+    tax: 'Impuesto', includeTax: 'Incluir Impuesto (9.5%)',
     taxExempt: 'Exento de Impuesto — Reventa (dealer)',
     exemptNote: 'Solo aplica esto si la certificación de reventa del dealer (# de licencia verificado + confirmación de reventa) está firmada y archivada. No es automático — tú lo confirmas antes de enviar.',
     manualDiscount: 'Descuento Manual ($)',
@@ -222,7 +226,7 @@ const I18N = {
     salesTax: 'Impuesto', exempt: '(Exento)', total: 'Total',
     boatNoCalc: 'No hay precio que calcular. Guarda o envía esta cotización como nota de "Contáctenos para disponibilidad".',
     savedQuotes: 'Cotizaciones Guardadas', shared: '(compartidas)', noSaved: 'Aún no hay cotizaciones guardadas.',
-    save: 'Guardar', pdf: 'PDF', email: 'Correo',
+    save: 'Guardar', pdf: 'PDF', email: 'Enviar',
     selectAuthorFirst: 'Selecciona quién creó esta cotización (José o Juan) antes de guardar.',
     selectAuthorFirst2: 'Selecciona quién creó esta cotización (José o Juan) primero.',
     belowMinBlock: (min)=>`Esta cotización de flota tiene menos de ${min} vehículos aprobados. Activa y completa Owner Override, o aprueba más vehículos, antes de continuar.`,
@@ -235,8 +239,12 @@ const I18N = {
     boatContact: 'Lavado de Botes — Contáctenos para disponibilidad. Precio proporcionado bajo solicitud.',
     footnote: 'Las citas se confirman según disponibilidad. Enviar o recibir este estimate no reserva una cita.',
     exemptResale: '(Exento — Reventa)',
-    emailIntro: (name)=>`Adjunto encontrarás tu estimate de detailing de Aquaman Services${name?', '+name:''}.`,
-    emailIntroNoAttach: (name)=>`Aquí está tu estimate de detailing de Aquaman Services${name?', '+name:''}. (Tu navegador no pudo adjuntar el PDF automáticamente — por favor adjunta el archivo que se acaba de descargar.)`,
+    emailSubject: 'Estimate - Aquaman Services (Detailing Automotriz)',
+    emailGreeting: (name)=> name ? `¡Hola ${name}!` : '¡Hola!',
+    emailBody1: 'Adjuntamos el estimate solicitado para el car wash detailing de su vehículo con Aquaman Services.',
+    emailBody2: 'Si tiene alguna pregunta o desea agendar el servicio, no dude en contactarnos.',
+    emailClosing: 'Gracias,',
+    emailNoAttachNote: '(Tu navegador no pudo adjuntar el PDF automáticamente — por favor adjunta el archivo que se acaba de descargar.)',
     pdfShareTitle: 'Estimate de Aquaman Services',
   }
 };
@@ -328,8 +336,10 @@ const ADDONS = {
     desc:{en:'Removes tree sap buildup from the exterior paint', es:'Elimina la acumulación de savia de árbol de la pintura exterior'}},
 };
 const FLEET_ADDON_DISCOUNT = 10;
+const FIXED_TAX_RATE = 9.5;
 const FLEET_MIN_VEHICLES = 5;
 const AUTHOR_DISPLAY = {Jose:'José', Juan:'Juan'};
+const AUTHOR_FULL_NAME = {Jose:'José Guevara', Juan:'Juan Espina'};
 
 /* ============ STATE ============ */
 let state = {
@@ -339,7 +349,7 @@ let state = {
   customer: {name:'', contact:'', address:'', makeModel:''},
   individual: {vehicleType:0, service:'super_wash', addons:{}},
   fleet: {vehicles: [], override:{active:false, name:'', reason:''}},
-  tax: {rate:'', exempt:false},
+  tax: {include:false, exempt:false},
   discount: 0,
   activeVehicleDraft: null,
 };
@@ -420,7 +430,7 @@ function calcTotals(){
   const subtotal = base.subtotal || 0;
   const discount = Number(state.discount) || 0;
   const afterDiscount = Math.max(0, subtotal - discount);
-  const rate = state.tax.exempt ? 0 : (Number(state.tax.rate) || 0);
+  const rate = (state.tax.exempt || !state.tax.include) ? 0 : FIXED_TAX_RATE;
   const tax = afterDiscount * (rate/100);
   const total = afterDiscount + tax;
   return {...base, subtotal, discount, tax, taxRate:rate, total};
@@ -652,8 +662,10 @@ function renderTaxCard(){
   return `
   <div class="card">
     <h2>${t('tax')}</h2>
-    <label>${t('taxRate')}</label>
-    <input type="number" id="tax-rate" step="0.01" min="0" value="${esc(state.tax.rate)}" placeholder="${t('taxRatePh')}" ${state.tax.exempt?'disabled':''}>
+    <div class="checkbox-wrap">
+      <input type="checkbox" id="tax-include" ${state.tax.include?'checked':''} ${state.tax.exempt?'disabled':''}>
+      <span style="font-size:13px;font-weight:700;">${t('includeTax')}</span>
+    </div>
     <div class="checkbox-wrap" style="margin-top:12px;">
       <input type="checkbox" id="tax-exempt" ${state.tax.exempt?'checked':''}>
       <span style="font-size:13px;font-weight:700;">${t('taxExempt')}</span>
@@ -675,7 +687,7 @@ function renderTotalsCard(){
     <div class="totals-row"><span class="label">${t('subtotal')}</span><span>${money(tt.subtotal)}</span></div>
     ${state.quoteType==='fleet' && tt.fleetDiscount ? `<div class="totals-row"><span class="label">${t('fleetDiscount')}</span><span>-${money(tt.fleetDiscount)}</span></div>` : ''}
     ${tt.discount ? `<div class="totals-row"><span class="label">${t('discount')}</span><span>-${money(tt.discount)}</span></div>` : ''}
-    <div class="totals-row"><span class="label">${t('salesTax')} ${state.tax.exempt?t('exempt'):tt.taxRate?'('+tt.taxRate+'%)':''}</span><span>${money(tt.tax)}</span></div>
+    <div class="totals-row"><span class="label">${t('salesTax')} ${state.tax.exempt?t('exempt'):(state.tax.include?'(9.5%)':'')}</span><span>${money(tt.tax)}</span></div>
     <div class="totals-row total"><span class="label">${t('total')}</span><span>${money(tt.total)}</span></div>
   </div>`;
 }
@@ -710,7 +722,7 @@ function attachHandlers(){
   bind('fv-type','change', e=>{ state.activeVehicleDraft.type = Number(e.target.value); render(); });
   bind('fv-makemodel','input', e=>{ state.activeVehicleDraft.makeModel = e.target.value; });
   bind('fv-service','change', e=>{ state.activeVehicleDraft.service = e.target.value; render(); });
-  bind('tax-rate','input', e=>{ state.tax.rate = e.target.value; render(); });
+  bind('tax-include','change', e=>{ state.tax.include = e.target.checked; render(); });
   bind('tax-exempt','change', e=>{ state.tax.exempt = e.target.checked; render(); });
   bind('manual-discount','input', e=>{ state.discount = e.target.value; render(); });
   bind('ov-active','change', e=>{ state.fleet.override.active = e.target.checked; render(); });
@@ -825,7 +837,7 @@ function generatePdfDoc(){
   doc.setTextColor(...gray); doc.setFont('helvetica','bold'); doc.setFontSize(8);
   doc.text(t('preparedBy').toUpperCase(), pageWidth-160, y+32);
   doc.setTextColor(20,20,40); doc.setFont('helvetica','normal'); doc.setFontSize(10.5);
-  doc.text((AUTHOR_DISPLAY[state.createdBy]||state.createdBy||'—') + ' · Aquaman Services', pageWidth-160, y+48);
+  doc.text((AUTHOR_FULL_NAME[state.createdBy]||state.createdBy||'—') + ' · Aquaman Services', pageWidth-160, y+48);
 
   let curY = Math.max(y2, y+64) + 20;
 
@@ -905,7 +917,7 @@ function generatePdfDoc(){
   doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...gray);
   doc.text(doc.splitTextToSize(t('footnote'), pageWidth-80), 40, curY);
   curY += 24;
-  doc.text('(901) 340-9733 · aquamanservicesllc.com', 40, curY);
+  doc.text('(901) 340-9733', 40, curY);
 
   return doc;
 }
@@ -924,6 +936,22 @@ function handlePrint(){
 }
 
 /* ============ EMAIL (native share with attached PDF, fallback to mailto) ============ */
+function buildEmailContent(){
+  const subject = t('emailSubject');
+  const bodyLines = [
+    t('emailGreeting')(state.customer.name),
+    '',
+    t('emailBody1'),
+    '',
+    t('emailBody2'),
+    '',
+    t('emailClosing'),
+    'Aquaman Services',
+    '(901) 340-9733',
+  ];
+  return {subject, body: bodyLines.join('\n')};
+}
+
 async function handleEmail(){
   if(!state.createdBy){ alert(t('selectAuthorFirst2')); return; }
   if(!canFinalize()){ alert(t('belowMinBlock')(FLEET_MIN_VEHICLES)); return; }
@@ -931,14 +959,13 @@ async function handleEmail(){
   const doc = generatePdfDoc();
   const blob = doc.output('blob');
   const filename = pdfFilename();
-  const subject = 'Aquaman Services — Estimate for ' + (state.customer.name || 'Customer');
-  const introText = t('emailIntro')(state.customer.name);
+  const {subject, body} = buildEmailContent();
 
   let shared = false;
   try{
     const file = new File([blob], filename, {type:'application/pdf'});
     if(navigator.canShare && navigator.canShare({files:[file]})){
-      await navigator.share({files:[file], title:t('pdfShareTitle'), text: subject + '\n\n' + introText});
+      await navigator.share({files:[file], title:t('pdfShareTitle'), text: subject + '\n\n' + body});
       shared = true;
     }
   }catch(err){
@@ -947,8 +974,8 @@ async function handleEmail(){
 
   if(!shared){
     doc.save(filename);
-    const body = t('emailIntroNoAttach')(state.customer.name) + '\n\n' + subject;
-    const mailto = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    const bodyWithNote = body + '\n\n' + t('emailNoAttachNote');
+    const mailto = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(bodyWithNote);
     window.location.href = mailto;
   }
 }
