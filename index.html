@@ -6,50 +6,37 @@
 <title>Aquaman Services — Quote Tool</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
 <style>
   :root{
-    --navy:#01033E;
-    --indigo:#0033FF;
-    --white:#FFFFFF;
-    --gray-900:#1A1B2E;
-    --gray-600:#5B5D74;
-    --gray-400:#8B8DA3;
-    --gray-200:#E4E5EE;
-    --gray-100:#F3F4F8;
-    --red:#D33;
-    --green:#0A8A4C;
-    --radius:10px;
+    --navy:#01033E; --indigo:#0033FF; --white:#FFFFFF;
+    --gray-900:#1A1B2E; --gray-600:#5B5D74; --gray-400:#8B8DA3;
+    --gray-200:#E4E5EE; --gray-100:#F3F4F8; --red:#D33; --green:#0A8A4C; --radius:10px;
   }
   *{box-sizing:border-box;}
   html,body{margin:0;padding:0;}
-  body{
-    font-family:'Inter',-apple-system,'Segoe UI',sans-serif;
-    background:var(--gray-100);
-    color:var(--gray-900);
-    -webkit-font-smoothing:antialiased;
-    padding-bottom:60px;
-  }
+  body{font-family:'Inter',-apple-system,'Segoe UI',sans-serif;background:var(--gray-100);color:var(--gray-900);-webkit-font-smoothing:antialiased;padding-bottom:60px;}
   #app-shell{max-width:480px;margin:0 auto;background:var(--white);min-height:100vh;box-shadow:0 0 40px rgba(1,3,62,0.06);}
 
-  /* header */
-  header{background:var(--navy);color:var(--white);padding:22px 20px 26px;position:relative;overflow:hidden;}
+  header{background:var(--navy);color:var(--white);padding:16px 20px 20px;position:relative;}
+  header .top-row{display:flex;justify-content:space-between;align-items:flex-start;}
   header .brand{font-weight:800;font-size:15px;letter-spacing:0.06em;}
   header .sub{font-weight:500;font-size:12px;color:#AEB3E8;margin-top:2px;letter-spacing:0.03em;}
+  .lang-toggle{display:flex;background:rgba(255,255,255,0.12);border-radius:8px;padding:3px;}
+  .lang-btn{padding:6px 10px;font-size:11.5px;font-weight:800;color:#AEB3E8;border-radius:6px;cursor:pointer;}
+  .lang-btn.active{background:var(--indigo);color:var(--white);}
+
   .trajectory{height:6px;position:relative;background:var(--navy);}
   .trajectory svg{display:block;width:100%;height:100%;}
 
-  /* section cards */
   main{padding:16px;}
   .card{background:var(--white);border:1px solid var(--gray-200);border-radius:var(--radius);padding:16px;margin-bottom:14px;}
   .card h2{font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;color:var(--gray-600);margin:0 0 12px;}
   .card h2 .accent{color:var(--indigo);}
 
-  /* pill selectors */
   .pill-row{display:flex;gap:8px;flex-wrap:wrap;}
-  .pill{
-    flex:1;min-width:70px;text-align:center;padding:10px 8px;border-radius:8px;border:1.5px solid var(--gray-200);
-    font-weight:700;font-size:13px;color:var(--gray-600);background:var(--white);cursor:pointer;transition:.12s;
-  }
+  .pill{flex:1;min-width:70px;text-align:center;padding:10px 8px;border-radius:8px;border:1.5px solid var(--gray-200);font-weight:700;font-size:13px;color:var(--gray-600);background:var(--white);cursor:pointer;transition:.12s;}
   .pill.active{background:var(--indigo);border-color:var(--indigo);color:var(--white);}
   .pill:active{transform:scale(0.97);}
 
@@ -69,9 +56,10 @@
   .addon-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:1px solid var(--gray-100);gap:10px;}
   .addon-row:last-child{border-bottom:none;}
   .addon-label{font-size:13.5px;font-weight:600;flex:1;}
+  .addon-desc{font-size:11px;color:var(--gray-400);margin-top:2px;line-height:1.3;}
   .addon-price{font-size:13px;font-weight:700;color:var(--gray-600);white-space:nowrap;}
-  .checkbox-wrap{display:flex;align-items:center;gap:9px;}
-  input[type=checkbox],input[type=radio]{width:19px;height:19px;accent-color:var(--indigo);flex-shrink:0;}
+  .checkbox-wrap{display:flex;align-items:flex-start;gap:9px;}
+  input[type=checkbox],input[type=radio]{width:19px;height:19px;accent-color:var(--indigo);flex-shrink:0;margin-top:1px;}
 
   .radio-group{display:flex;gap:8px;margin-top:6px;}
   .radio-opt{flex:1;border:1.5px solid var(--gray-200);border-radius:8px;padding:9px;display:flex;align-items:center;gap:7px;cursor:pointer;}
@@ -81,7 +69,6 @@
   .subgroup{background:var(--gray-100);border-radius:8px;padding:10px 12px;margin-top:8px;}
   .subgroup .subtitle{font-size:11.5px;font-weight:800;color:var(--gray-600);margin-bottom:6px;text-transform:uppercase;letter-spacing:.04em;}
 
-  /* vehicle cards (fleet) */
   .vehicle-card{border:1.5px solid var(--gray-200);border-radius:9px;padding:12px;margin-bottom:10px;position:relative;}
   .vehicle-card.approved{border-color:var(--green);background:#F2FBF6;}
   .vehicle-card .vtitle{font-weight:800;font-size:13.5px;display:flex;justify-content:space-between;align-items:center;}
@@ -123,42 +110,23 @@
   .saved-item .si-total{font-weight:800;color:var(--navy);font-size:14px;}
 
   .empty-state{text-align:center;padding:20px 10px;color:var(--gray-400);font-size:13px;font-weight:600;}
-
-  /* print preview (hidden on screen) */
-  #print-area{display:none;}
-
-  @media print{
-    body *{visibility:hidden;}
-    #print-area,#print-area *{visibility:visible;}
-    #print-area{display:block;position:absolute;top:0;left:0;width:100%;padding:0;margin:0;}
-    #app-shell,.footer-actions{display:none;}
-  }
-
-  .pv-header{background:var(--navy);color:var(--white);padding:26px 30px;position:relative;}
-  .pv-header .pv-tag{font-size:11px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;}
-  .pv-header h1{font-size:24px;margin:6px 0 2px;font-weight:800;}
-  .pv-header .pv-sub{font-size:12px;color:#AEB3E8;font-weight:500;}
-  .pv-diag{height:4px;background:var(--indigo);}
-  .pv-body{padding:24px 30px;}
-  .pv-cols{display:flex;justify-content:space-between;gap:20px;margin-bottom:18px;}
-  .pv-col h3{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--gray-600);margin:0 0 6px;}
-  .pv-col p{margin:0;font-size:13px;line-height:1.5;}
-  table.pv-table{width:100%;border-collapse:collapse;margin-top:10px;}
-  table.pv-table th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:var(--gray-600);padding:8px 0;border-bottom:1.5px solid var(--gray-200);}
-  table.pv-table td{padding:9px 0;border-bottom:1px solid var(--gray-100);font-size:13px;vertical-align:top;}
-  table.pv-table td.amt{text-align:right;font-weight:700;white-space:nowrap;}
-  .pv-summary{margin-top:16px;padding-top:12px;border-top:1.5px solid var(--gray-200);}
-  .pv-summary .row{display:flex;justify-content:space-between;font-size:13px;padding:4px 0;}
-  .pv-summary .row.total{font-size:18px;font-weight:800;color:var(--navy);border-top:1.5px solid var(--gray-200);margin-top:6px;padding-top:10px;}
-  .pv-footnote{font-size:11px;color:var(--gray-600);margin-top:20px;line-height:1.5;}
+  .toast{position:fixed;bottom:70px;left:50%;transform:translateX(-50%);background:var(--navy);color:#fff;padding:10px 18px;border-radius:20px;font-size:13px;font-weight:700;z-index:999;box-shadow:0 4px 20px rgba(0,0,0,.2);}
 </style>
 </head>
 <body>
 
 <div id="app-shell">
   <header>
-    <div class="brand">AQUAMAN SERVICES</div>
-    <div class="sub">Quote Tool — Internal Use</div>
+    <div class="top-row">
+      <div>
+        <div class="brand">AQUAMAN SERVICES</div>
+        <div class="sub" id="hdr-sub">Quote Tool — Internal Use</div>
+      </div>
+      <div class="lang-toggle">
+        <div class="lang-btn" data-action="set-lang" data-value="en" id="lang-en">EN</div>
+        <div class="lang-btn" data-action="set-lang" data-value="es" id="lang-es">ES</div>
+      </div>
+    </div>
   </header>
   <div class="trajectory">
     <svg viewBox="0 0 480 6" preserveAspectRatio="none"><polyline points="0,5 360,5 380,1 480,1" fill="none" stroke="#0033FF" stroke-width="3"/></svg>
@@ -168,42 +136,196 @@
 
   <div class="footer-actions">
     <button class="btn btn-outline btn-sm" id="btn-save">Save</button>
-    <button class="btn btn-secondary btn-sm" id="btn-print">Print / PDF</button>
+    <button class="btn btn-secondary btn-sm" id="btn-print">PDF</button>
     <button class="btn btn-primary btn-sm" id="btn-email">Email</button>
   </div>
 </div>
 
-<div id="print-area"></div>
-
 <script>
-/* ============ PRICING DATA ============ */
-const VEHICLE_TYPES = ['Sedan','SUV','Regular Truck','Big Truck'];
+/* ============ I18N ============ */
+const I18N = {
+  en: {
+    subtitle: 'Quote Tool — Internal Use',
+    createdBy: 'Quote created by',
+    quoteType: 'Quote Type',
+    individual: 'Individual', fleet: 'Fleet (5+)', boat: 'Boat Wash',
+    customer: 'Customer', customerName: 'Customer / Company Name', customerNamePh: 'e.g. John Smith',
+    contact: 'Phone or Email', contactPh: 'e.g. (901) 555-0100',
+    address: 'Service Address (optional)', addressPh: 'Street, City, State',
+    makeModel: 'Vehicle Make & Model', makeModelPh: 'e.g. Toyota Camry',
+    serviceDetails: 'Service Details', vehicleType: 'Vehicle Type', package: 'Package',
+    addons: 'Add-Ons', chooseOne: '— choose one', wash: 'Wash', decon: 'Decon',
+    carpetTitle: 'Carpet', fabricTitle: 'Fabric Seats',
+    boatTitle: 'Boat Wash', boatInfo: 'Boat Wash pricing is not published yet. This quote will show "Contact us for availability" — do not enter or promise a price.',
+    fleetVehicles: 'Fleet Vehicles', approvedOf: 'approved', totalAdded: 'total added',
+    belowMinWarn: (min)=>`Below ${min} approved vehicles: this quote stays a draft. PDF and Email are disabled until ${min} vehicles are approved, or Owner Override is used below.`,
+    overrideActiveWarn: (name,reason)=>`Owner Override active — ${name||'(no name entered)'}: "${reason||'(no reason entered)'}". This is a simplified override with no real authentication. Full security arrives with Step 1 of the build plan.`,
+    newVehicle: 'New Vehicle', service: 'Service', addonsForVehicle: 'Add-Ons for this vehicle',
+    cancel: 'Cancel', addApprove: 'Add & Approve Vehicle',
+    approve: 'Approve', remove: 'Remove', addVehicle: '+ Add Vehicle', noVehicles: 'No vehicles added yet.',
+    ownerOverride: 'Owner Override', tempNoLogin: '(temporary, no real login)',
+    enableOverride: (min)=>`Enable override to quote fewer than ${min} vehicles as fleet`,
+    authorizedBy: 'Authorized by (José or Juan)', reason: 'Reason', reasonPh: 'Why this fleet quote needs fewer vehicles',
+    tax: 'Tax', taxRate: 'Sales Tax Rate (%)', taxRatePh: 'e.g. 9.75',
+    taxExempt: 'Tax Exempt — Resale (dealer)',
+    exemptNote: "Only apply this if the dealer's resale certification (license # verified + resale confirmation) is signed and on file. Not automatic — you confirm this before sending.",
+    manualDiscount: 'Manual Discount ($)',
+    summary: 'Summary', subtotal: 'Subtotal', fleetDiscount: 'Fleet Add-On Discount', discount: 'Discount',
+    salesTax: 'Sales Tax', exempt: '(Exempt)', total: 'Total',
+    boatNoCalc: 'No pricing to calculate. Save or send this quote as a "Contact us for availability" note.',
+    savedQuotes: 'Saved Quotes', shared: '(shared)', noSaved: 'No saved quotes yet.',
+    save: 'Save', pdf: 'PDF', email: 'Email',
+    selectAuthorFirst: 'Please select who created this quote (José or Juan) before saving.',
+    selectAuthorFirst2: 'Please select who created this quote (José or Juan) first.',
+    belowMinBlock: (min)=>`This fleet quote has fewer than ${min} approved vehicles. Enable and complete Owner Override, or approve more vehicles, before continuing.`,
+    quoteSaved: 'Quote saved.',
+    confirmLoad: 'Load this saved quote? Unsaved changes to the current quote will be lost.',
+    // Preview / PDF
+    pvTag: 'Estimate — Not an Invoice', pvTagline: 'Professional detailing, down to the last detail.',
+    preparedFor: 'Prepared For', date: 'Date', preparedBy: 'Prepared By',
+    serviceAddon: 'Service / Add-On', vehicle: 'Vehicle', amount: 'Amount',
+    whatsIncluded: "What's Included",
+    boatContact: 'Boat Wash — Contact us for availability. Pricing provided upon request.',
+    footnote: 'Appointments are confirmed based on availability. Submitting or receiving this estimate does not reserve an appointment.',
+    exemptResale: '(Exempt — Resale)',
+    emailIntro: (name)=>`Please find attached your detailing estimate from Aquaman Services${name?', '+name:''}.`,
+    emailIntroNoAttach: (name)=>`Here is your detailing estimate from Aquaman Services${name?', '+name:''}. (Your browser could not auto-attach the PDF — please attach the file that was just downloaded.)`,
+    pdfShareTitle: 'Aquaman Services Estimate',
+  },
+  es: {
+    subtitle: 'Herramienta de Cotización — Uso Interno',
+    createdBy: 'Cotización creada por',
+    quoteType: 'Tipo de Cotización',
+    individual: 'Individual', fleet: 'Flota (5+)', boat: 'Lavado de Botes',
+    customer: 'Cliente', customerName: 'Nombre del Cliente / Empresa', customerNamePh: 'ej. Juan Pérez',
+    contact: 'Teléfono o Correo', contactPh: 'ej. (901) 555-0100',
+    address: 'Dirección del Servicio (opcional)', addressPh: 'Calle, Ciudad, Estado',
+    makeModel: 'Marca y Modelo del Vehículo', makeModelPh: 'ej. Toyota Camry',
+    serviceDetails: 'Detalles del Servicio', vehicleType: 'Tipo de Vehículo', package: 'Paquete',
+    addons: 'Add-Ons', chooseOne: '— elige uno', wash: 'Lavado', decon: 'Descon',
+    carpetTitle: 'Alfombra', fabricTitle: 'Asientos de Tela',
+    boatTitle: 'Lavado de Botes', boatInfo: 'El precio del Lavado de Botes aún no está publicado. Esta cotización mostrará "Contáctenos para disponibilidad" — no ingreses ni prometas un precio.',
+    fleetVehicles: 'Vehículos de la Flota', approvedOf: 'aprobados', totalAdded: 'agregados en total',
+    belowMinWarn: (min)=>`Menos de ${min} vehículos aprobados: esta cotización queda como borrador. El PDF y el correo están deshabilitados hasta aprobar ${min} vehículos, o usar Owner Override abajo.`,
+    overrideActiveWarn: (name,reason)=>`Owner Override activo — ${name||'(sin nombre)'}: "${reason||'(sin razón)'}". Esta es una versión simplificada sin autenticación real. La seguridad completa llega con el Paso 1 del plan de construcción.`,
+    newVehicle: 'Nuevo Vehículo', service: 'Servicio', addonsForVehicle: 'Add-Ons para este vehículo',
+    cancel: 'Cancelar', addApprove: 'Agregar y Aprobar Vehículo',
+    approve: 'Aprobar', remove: 'Quitar', addVehicle: '+ Agregar Vehículo', noVehicles: 'Aún no se han agregado vehículos.',
+    ownerOverride: 'Owner Override', tempNoLogin: '(temporal, sin login real)',
+    enableOverride: (min)=>`Activar excepción para cotizar menos de ${min} vehículos como flota`,
+    authorizedBy: 'Autorizado por (José o Juan)', reason: 'Razón', reasonPh: 'Por qué esta cotización de flota necesita menos vehículos',
+    tax: 'Impuesto', taxRate: 'Tasa de Impuesto (%)', taxRatePh: 'ej. 9.75',
+    taxExempt: 'Exento de Impuesto — Reventa (dealer)',
+    exemptNote: 'Solo aplica esto si la certificación de reventa del dealer (# de licencia verificado + confirmación de reventa) está firmada y archivada. No es automático — tú lo confirmas antes de enviar.',
+    manualDiscount: 'Descuento Manual ($)',
+    summary: 'Resumen', subtotal: 'Subtotal', fleetDiscount: 'Descuento de Flota en Add-Ons', discount: 'Descuento',
+    salesTax: 'Impuesto', exempt: '(Exento)', total: 'Total',
+    boatNoCalc: 'No hay precio que calcular. Guarda o envía esta cotización como nota de "Contáctenos para disponibilidad".',
+    savedQuotes: 'Cotizaciones Guardadas', shared: '(compartidas)', noSaved: 'Aún no hay cotizaciones guardadas.',
+    save: 'Guardar', pdf: 'PDF', email: 'Correo',
+    selectAuthorFirst: 'Selecciona quién creó esta cotización (José o Juan) antes de guardar.',
+    selectAuthorFirst2: 'Selecciona quién creó esta cotización (José o Juan) primero.',
+    belowMinBlock: (min)=>`Esta cotización de flota tiene menos de ${min} vehículos aprobados. Activa y completa Owner Override, o aprueba más vehículos, antes de continuar.`,
+    quoteSaved: 'Cotización guardada.',
+    confirmLoad: '¿Cargar esta cotización guardada? Se perderán los cambios sin guardar de la cotización actual.',
+    pvTag: 'Estimate — No es una Factura', pvTagline: 'Detailing profesional, hasta el último detalle.',
+    preparedFor: 'Preparado Para', date: 'Fecha', preparedBy: 'Preparado Por',
+    serviceAddon: 'Servicio / Add-On', vehicle: 'Vehículo', amount: 'Monto',
+    whatsIncluded: 'Qué Incluye',
+    boatContact: 'Lavado de Botes — Contáctenos para disponibilidad. Precio proporcionado bajo solicitud.',
+    footnote: 'Las citas se confirman según disponibilidad. Enviar o recibir este estimate no reserva una cita.',
+    exemptResale: '(Exento — Reventa)',
+    emailIntro: (name)=>`Adjunto encontrarás tu estimate de detailing de Aquaman Services${name?', '+name:''}.`,
+    emailIntroNoAttach: (name)=>`Aquí está tu estimate de detailing de Aquaman Services${name?', '+name:''}. (Tu navegador no pudo adjuntar el PDF automáticamente — por favor adjunta el archivo que se acaba de descargar.)`,
+    pdfShareTitle: 'Estimate de Aquaman Services',
+  }
+};
+function t(key){ const v = I18N[state.lang][key]; return v; }
+function L(obj){ return obj[state.lang]; }
+
+/* ============ PRICING DATA (bilingual) ============ */
+const VEHICLE_TYPE_LABELS = {
+  en: ['Sedan','SUV','Regular Truck','Big Truck'],
+  es: ['Sedán','SUV','Camioneta Regular','Camioneta Grande'],
+};
+
+const EXTERIOR_INCLUDES = {
+  en: [
+    'Pre-wash decontamination — removes bugs, tar, and bonded contaminants before washing',
+    'Exterior hand wash with wax — full exterior wash finished with a protective wax coat',
+    'Wheel & rim cleaning — removes brake dust and road grime',
+    'Fender well cleaning',
+    'Exterior window cleaning — streak-free',
+    'Rubber floor mat wash',
+    'Frame / undercarriage wash',
+    'Brake dust remover',
+    'Exterior plastic trim conditioner',
+  ],
+  es: [
+    'Descontaminación previa al lavado — elimina insectos, alquitrán y contaminantes adheridos antes del lavado',
+    'Lavado exterior a mano con cera — lavado completo terminado con capa protectora de cera',
+    'Limpieza de rines y ruedas — elimina polvo de freno y suciedad del camino',
+    'Limpieza de guardafangos',
+    'Limpieza de ventanas exteriores — sin rayas',
+    'Lavado de tapetes de goma',
+    'Lavado de chasis / tren bajo',
+    'Removedor de polvo de freno',
+    'Acondicionador de plástico exterior',
+  ]
+};
+const INTERIOR_INCLUDES = {
+  en: [
+    'Interior glass cleaning — streak-free',
+    'Interior plastic surface cleaning',
+    'Plastic conditioner (interior)',
+    'Carpet & seat vacuuming',
+  ],
+  es: [
+    'Limpieza de vidrios interiores — sin rayas',
+    'Limpieza de superficies plásticas interiores',
+    'Acondicionador de plástico (interior)',
+    'Aspirado de alfombras y asientos',
+  ]
+};
+const FULL_INCLUDES = {en:[...EXTERIOR_INCLUDES.en,...INTERIOR_INCLUDES.en], es:[...EXTERIOR_INCLUDES.es,...INTERIOR_INCLUDES.es]};
 
 const INDIVIDUAL_SERVICES = {
-  'Super Wash Package': [130,150,170,190],
-  'Interior Only': [80,100,100,120],
-  'Exterior Only': [70,80,100,120],
+  super_wash:    {label:{en:'Super Wash Package', es:'Paquete Súper Wash'}, prices:[130,150,170,190], includes:FULL_INCLUDES},
+  interior_only: {label:{en:'Interior Only', es:'Solo Interior'}, prices:[80,100,100,120], includes:INTERIOR_INCLUDES},
+  exterior_only: {label:{en:'Exterior Only', es:'Solo Exterior'}, prices:[70,80,100,120], includes:EXTERIOR_INCLUDES},
 };
 
 const FLEET_SERVICES = {
-  'Fleet Detail': [100,120,140,170],
-  'Interior Only': [55,65,75,85],
-  'Exterior Only': [45,55,65,75],
+  fleet_detail:     {label:{en:'Super Wash - Fleet Detail', es:'Súper Wash - Detalle de Flota'}, prices:[100,120,140,170], includes:FULL_INCLUDES},
+  interior_fleet:   {label:{en:'Interior Only - Fleet', es:'Solo Interior - Flota'}, prices:[55,65,75,85], includes:INTERIOR_INCLUDES},
+  exterior_fleet:   {label:{en:'Exterior Only - Fleet', es:'Solo Exterior - Flota'}, prices:[45,55,65,75], includes:EXTERIOR_INCLUDES},
 };
 
 const ADDONS = {
-  carpet_wash:   {label:'Carpet Shampoo Clean — Wash', prices:[78,85,98,115], group:'carpet'},
-  carpet_decon:  {label:'Carpet Shampoo Clean — Decontamination', prices:[39,45,55,65], group:'carpet'},
-  fabric_wash:   {label:'Fabric Seat Shampoo Clean — Wash', prices:[78,88,98,108], group:'fabric'},
-  fabric_decon:  {label:'Fabric Seat Shampoo Clean — Decontamination', prices:[40,50,60,70], group:'fabric'},
-  steam_decon:   {label:'Steam Decontamination', prices:[19,28,38,48]},
-  ozone:         {label:'Ozone Odor Treatment', prices:[39,49,59,69]},
-  headliner:     {label:'Headliner Cleaning', prices:[40,50,60,70]},
-  leather:       {label:'Leather Treatment & Conditioner', prices:[40,48,58,68]},
-  pet_hair:      {label:'Pet Hair Removal', prices:[25,35,45,55]},
-  engine_bay:    {label:'Engine Bay Wash', prices:[50,60,70,100]},
-  clay_bar:      {label:'Clay Bar Treatment', prices:[50,60,70,80]},
-  tree_sap:      {label:'Tree Sap Removal', prices:[50,60,70,80]},
+  carpet_wash:   {label:{en:'Carpet Shampoo Clean — Wash', es:'Lavado de Alfombra con Shampoo — Lavado'}, prices:[78,85,98,115], group:'carpet',
+    desc:{en:'Brushing + shampoo + stain remover, following P&S method, using injection-extraction machine', es:'Cepillado + shampoo + removedor de manchas, método P&S, máquina de inyección-extracción'}},
+  carpet_decon:  {label:{en:'Carpet Shampoo Clean — Decontamination', es:'Lavado de Alfombra con Shampoo — Descontaminación'}, prices:[39,45,55,65], group:'carpet',
+    desc:{en:'3-product treatment following P&S method', es:'Tratamiento de 3 productos siguiendo el método P&S'}},
+  fabric_wash:   {label:{en:'Fabric Seat Shampoo Clean — Wash', es:'Lavado de Asientos de Tela — Lavado'}, prices:[78,88,98,108], group:'fabric',
+    desc:{en:'Brushing + shampoo + stain remover, following P&S method, using injection-extraction machine', es:'Cepillado + shampoo + removedor de manchas, método P&S, máquina de inyección-extracción'}},
+  fabric_decon:  {label:{en:'Fabric Seat Shampoo Clean — Decontamination', es:'Lavado de Asientos de Tela — Descontaminación'}, prices:[40,50,60,70], group:'fabric',
+    desc:{en:'3-product treatment following P&S method', es:'Tratamiento de 3 productos siguiendo el método P&S'}},
+  steam_decon:   {label:{en:'Steam Decontamination', es:'Descontaminación con Vapor'}, prices:[19,28,38,48],
+    desc:{en:'Light steam-only treatment for surface-level dirt, without shampoo', es:'Tratamiento ligero solo con vapor para suciedad superficial, sin shampoo'}},
+  ozone:         {label:{en:'Ozone Odor Treatment', es:'Tratamiento de Ozono para Olores'}, prices:[39,49,59,69],
+    desc:{en:'Eliminates odors using ozone treatment', es:'Elimina olores mediante tratamiento con ozono'}},
+  headliner:     {label:{en:'Headliner Cleaning', es:'Limpieza de Techo Interior'}, prices:[40,50,60,70],
+    desc:{en:"Cleans stains and dirt from the vehicle's headliner", es:'Limpia manchas y suciedad del techo interior del vehículo'}},
+  leather:       {label:{en:'Leather Treatment & Conditioner', es:'Tratamiento y Acondicionador de Cuero'}, prices:[40,48,58,68],
+    desc:{en:'Cleans and conditions leather seats to prevent cracking and restore softness', es:'Limpia y acondiciona asientos de cuero para prevenir grietas y restaurar suavidad'}},
+  pet_hair:      {label:{en:'Pet Hair Removal', es:'Remoción de Pelo de Mascota'}, prices:[25,35,45,55],
+    desc:{en:'Removes embedded pet hair from carpets and seats', es:'Elimina el pelo de mascota incrustado en alfombras y asientos'}},
+  engine_bay:    {label:{en:'Engine Bay Wash', es:'Lavado del Compartimento del Motor'}, prices:[50,60,70,100],
+    desc:{en:'Degreases and cleans the engine bay', es:'Desengrasa y limpia el compartimento del motor'}},
+  clay_bar:      {label:{en:'Clay Bar Treatment', es:'Tratamiento de Clay Bar'}, prices:[50,60,70,80],
+    desc:{en:'Removes embedded contaminants from paint for a smooth finish', es:'Elimina contaminantes incrustados en la pintura para un acabado liso'}},
+  tree_sap:      {label:{en:'Tree Sap Removal', es:'Remoción de Savia de Árbol'}, prices:[50,60,70,80],
+    desc:{en:'Removes tree sap buildup from the exterior paint', es:'Elimina la acumulación de savia de árbol de la pintura exterior'}},
 };
 const FLEET_ADDON_DISCOUNT = 10;
 const FLEET_MIN_VEHICLES = 5;
@@ -211,14 +333,15 @@ const AUTHOR_DISPLAY = {Jose:'José', Juan:'Juan'};
 
 /* ============ STATE ============ */
 let state = {
+  lang: 'en',
   createdBy: '',
-  quoteType: 'individual', // individual | fleet | boat
-  customer: {name:'', contact:'', address:''},
-  individual: {vehicleType:0, service:'Super Wash Package', addons:{}},
+  quoteType: 'individual',
+  customer: {name:'', contact:'', address:'', makeModel:''},
+  individual: {vehicleType:0, service:'super_wash', addons:{}},
   fleet: {vehicles: [], override:{active:false, name:'', reason:''}},
   tax: {rate:'', exempt:false},
   discount: 0,
-  activeVehicleDraft: null, // vehicle being built before adding to list
+  activeVehicleDraft: null,
 };
 let savedQuotes = [];
 let editingSavedId = null;
@@ -238,24 +361,29 @@ async function persistSavedQuotes(){
 /* ============ HELPERS ============ */
 function money(n){ return '$' + (Math.round(n*100)/100).toFixed(2); }
 function newId(){ return 'v' + Math.random().toString(36).slice(2,9); }
-
-function emptyVehicleDraft(){
-  return {id:newId(), type:0, service:'Fleet Detail', addons:{}, approved:false};
+function esc(s){ return String(s==null?'':s).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
+function emptyVehicleDraft(){ return {id:newId(), type:0, service:'fleet_detail', addons:{}, approved:false, makeModel:''}; }
+function showToast(msg){
+  const el = document.createElement('div');
+  el.className='toast'; el.textContent = msg;
+  document.body.appendChild(el);
+  setTimeout(()=>el.remove(), 2200);
+}
+function updateOverrideBannerText(){
+  const el = document.getElementById('override-banner');
+  if(el) el.textContent = t('overrideActiveWarn')(state.fleet.override.name, state.fleet.override.reason);
 }
 
 /* ============ CALCULATIONS ============ */
 function calcIndividualLines(){
-  const lines = [];
   const vt = state.individual.vehicleType;
-  const svc = state.individual.service;
-  if(svc === 'Boat Wash'){
-    return {lines:[{label:'Boat Wash', vehicle:'—', amount:null, note:'Contact us for availability'}], subtotal:0};
-  }
-  lines.push({label: svc, vehicle: VEHICLE_TYPES[vt], amount: INDIVIDUAL_SERVICES[svc][vt]});
+  const svcKey = state.individual.service;
+  const svc = INDIVIDUAL_SERVICES[svcKey];
+  const lines = [{key:svcKey, label:L(svc.label), vehicle:L(VEHICLE_TYPE_LABELS)[vt], amount:svc.prices[vt], includes:L(svc.includes)}];
   Object.keys(state.individual.addons).forEach(key=>{
     if(state.individual.addons[key]){
       const a = ADDONS[key];
-      lines.push({label:a.label, vehicle:VEHICLE_TYPES[vt], amount:a.prices[vt]});
+      lines.push({key, label:L(a.label), vehicle:L(VEHICLE_TYPE_LABELS)[vt], amount:a.prices[vt], desc:L(a.desc)});
     }
   });
   const subtotal = lines.reduce((s,l)=> s + (l.amount||0), 0);
@@ -267,12 +395,14 @@ function calcFleetLines(){
   let lines = [];
   let fleetDiscount = 0;
   approved.forEach((v,idx)=>{
-    lines.push({label: v.service, vehicle: VEHICLE_TYPES[v.type] + ' #' + (idx+1), amount: FLEET_SERVICES[v.service][v.type]});
+    const svc = FLEET_SERVICES[v.service];
+    const vLabel = L(VEHICLE_TYPE_LABELS)[v.type] + ' #' + (idx+1) + (v.makeModel?(' — '+v.makeModel):'');
+    lines.push({key:v.service, label:L(svc.label), vehicle:vLabel, amount:svc.prices[v.type], includes:L(svc.includes)});
     Object.keys(v.addons).forEach(key=>{
       if(v.addons[key]){
         const a = ADDONS[key];
         const full = a.prices[v.type];
-        lines.push({label: a.label, vehicle: VEHICLE_TYPES[v.type] + ' #' + (idx+1), amount: full});
+        lines.push({key, label:L(a.label), vehicle:vLabel, amount:full, desc:L(a.desc)});
         fleetDiscount += FLEET_ADDON_DISCOUNT;
       }
     });
@@ -285,7 +415,7 @@ function calcTotals(){
   let base;
   if(state.quoteType === 'individual') base = calcIndividualLines();
   else if(state.quoteType === 'fleet') base = calcFleetLines();
-  else base = {lines:[{label:'Boat Wash', vehicle:'—', amount:null, note:'Contact us for availability'}], subtotal:0, fleetDiscount:0};
+  else base = {lines:[{key:'boat', label:t('boat'), vehicle:'—', amount:null}], subtotal:0, fleetDiscount:0};
 
   const subtotal = base.subtotal || 0;
   const discount = Number(state.discount) || 0;
@@ -296,8 +426,23 @@ function calcTotals(){
   return {...base, subtotal, discount, tax, taxRate:rate, total};
 }
 
-/* ============ RENDER: MAIN APP ============ */
+function uniqueIncludesBlocks(lines){
+  const seen = {}; const blocks = [];
+  lines.forEach(l=>{
+    if(l.includes && !seen[l.key]){ seen[l.key]=true; blocks.push({label:l.label, includes:l.includes}); }
+  });
+  return blocks;
+}
+
+/* ============ RENDER ============ */
 function render(){
+  document.getElementById('hdr-sub').textContent = t('subtitle');
+  document.getElementById('lang-en').className = 'lang-btn' + (state.lang==='en'?' active':'');
+  document.getElementById('lang-es').className = 'lang-btn' + (state.lang==='es'?' active':'');
+  document.getElementById('btn-save').textContent = t('save');
+  document.getElementById('btn-print').textContent = t('pdf');
+  document.getElementById('btn-email').textContent = t('email');
+
   const m = document.getElementById('main-content');
   m.innerHTML = `
     ${renderCreatedBy()}
@@ -316,7 +461,7 @@ function render(){
 function renderCreatedBy(){
   return `
   <div class="card">
-    <h2>Quote created by</h2>
+    <h2>${t('createdBy')}</h2>
     <div class="pill-row">
       <div class="pill ${state.createdBy==='Jose'?'active':''}" data-action="set-author" data-value="Jose">José</div>
       <div class="pill ${state.createdBy==='Juan'?'active':''}" data-action="set-author" data-value="Juan">Juan</div>
@@ -327,11 +472,11 @@ function renderCreatedBy(){
 function renderQuoteTypeTabs(){
   return `
   <div class="card">
-    <h2>Quote Type</h2>
+    <h2>${t('quoteType')}</h2>
     <div class="tabs">
-      <div class="tab ${state.quoteType==='individual'?'active':''}" data-action="set-type" data-value="individual">Individual</div>
-      <div class="tab ${state.quoteType==='fleet'?'active':''}" data-action="set-type" data-value="fleet">Fleet (5+)</div>
-      <div class="tab ${state.quoteType==='boat'?'active':''}" data-action="set-type" data-value="boat">Boat Wash</div>
+      <div class="tab ${state.quoteType==='individual'?'active':''}" data-action="set-type" data-value="individual">${t('individual')}</div>
+      <div class="tab ${state.quoteType==='fleet'?'active':''}" data-action="set-type" data-value="fleet">${t('fleet')}</div>
+      <div class="tab ${state.quoteType==='boat'?'active':''}" data-action="set-type" data-value="boat">${t('boat')}</div>
     </div>
   </div>`;
 }
@@ -339,25 +484,32 @@ function renderQuoteTypeTabs(){
 function renderCustomerCard(){
   return `
   <div class="card">
-    <h2>Customer</h2>
-    <label>Customer / Company Name</label>
-    <input type="text" id="cust-name" value="${esc(state.customer.name)}" placeholder="e.g. John Smith">
-    <label>Phone or Email</label>
-    <input type="text" id="cust-contact" value="${esc(state.customer.contact)}" placeholder="e.g. (901) 555-0100">
-    <label>Service Address (optional)</label>
-    <input type="text" id="cust-address" value="${esc(state.customer.address)}" placeholder="Street, City, State">
+    <h2>${t('customer')}</h2>
+    <label>${t('customerName')}</label>
+    <input type="text" id="cust-name" value="${esc(state.customer.name)}" placeholder="${t('customerNamePh')}">
+    <label>${t('contact')}</label>
+    <input type="text" id="cust-contact" value="${esc(state.customer.contact)}" placeholder="${t('contactPh')}">
+    <label>${t('address')}</label>
+    <input type="text" id="cust-address" value="${esc(state.customer.address)}" placeholder="${t('addressPh')}">
+    ${state.quoteType==='individual' ? `
+    <label>${t('makeModel')}</label>
+    <input type="text" id="cust-makemodel" value="${esc(state.customer.makeModel)}" placeholder="${t('makeModelPh')}">
+    ` : ''}
   </div>`;
 }
 
-function addonRow(key, currentAddons, vt, radioGroupSelected){
+function addonRow(key, currentAddons, vt){
   const a = ADDONS[key];
-  if(a.group) return ''; // handled separately in radio groups
+  if(a.group) return '';
   const checked = !!currentAddons[key];
   return `
   <div class="addon-row">
     <div class="checkbox-wrap">
       <input type="checkbox" data-action="toggle-addon" data-key="${key}" ${checked?'checked':''}>
-      <span class="addon-label">${a.label}</span>
+      <div>
+        <div class="addon-label">${L(a.label)}</div>
+        <div class="addon-desc">${L(a.desc)}</div>
+      </div>
     </div>
     <span class="addon-price">${money(a.prices[vt])}</span>
   </div>`;
@@ -368,25 +520,25 @@ function radioGroupHtml(group, currentAddons, vt, labelTitle){
   const selected = currentAddons[washKey] ? 'wash' : (currentAddons[deconKey] ? 'decon' : null);
   return `
   <div class="subgroup">
-    <div class="subtitle">${labelTitle} — choose one</div>
+    <div class="subtitle">${labelTitle} ${t('chooseOne')}</div>
     <div class="radio-group">
       <div class="radio-opt ${selected==='wash'?'selected':''}" data-action="set-radio-addon" data-group="${group}" data-value="wash">
         <input type="radio" ${selected==='wash'?'checked':''}>
-        <span>Wash — ${money(ADDONS[washKey].prices[vt])}</span>
+        <span>${t('wash')} — ${money(ADDONS[washKey].prices[vt])}</span>
       </div>
       <div class="radio-opt ${selected==='decon'?'selected':''}" data-action="set-radio-addon" data-group="${group}" data-value="decon">
         <input type="radio" ${selected==='decon'?'checked':''}>
-        <span>Decon — ${money(ADDONS[deconKey].prices[vt])}</span>
+        <span>${t('decon')} — ${money(ADDONS[deconKey].prices[vt])}</span>
       </div>
     </div>
   </div>`;
 }
 
-function renderAddonsBlock(currentAddons, vt, idPrefix){
+function renderAddonsBlock(currentAddons, vt){
   const singleKeys = Object.keys(ADDONS).filter(k=>!ADDONS[k].group);
   return `
-    ${radioGroupHtml('carpet', currentAddons, vt, 'Carpet')}
-    ${radioGroupHtml('fabric', currentAddons, vt, 'Fabric Seats')}
+    ${radioGroupHtml('carpet', currentAddons, vt, t('carpetTitle'))}
+    ${radioGroupHtml('fabric', currentAddons, vt, t('fabricTitle'))}
     <div style="margin-top:8px;">
       ${singleKeys.map(k=>addonRow(k, currentAddons, vt)).join('')}
     </div>
@@ -397,16 +549,16 @@ function renderIndividualCard(){
   const {vehicleType, service, addons} = state.individual;
   return `
   <div class="card">
-    <h2>Service Details</h2>
-    <label>Vehicle Type</label>
+    <h2>${t('serviceDetails')}</h2>
+    <label>${t('vehicleType')}</label>
     <select id="ind-vtype">
-      ${VEHICLE_TYPES.map((v,i)=>`<option value="${i}" ${i==vehicleType?'selected':''}>${v}</option>`).join('')}
+      ${L(VEHICLE_TYPE_LABELS).map((v,i)=>`<option value="${i}" ${i==vehicleType?'selected':''}>${v}</option>`).join('')}
     </select>
-    <label>Package</label>
+    <label>${t('package')}</label>
     <select id="ind-service">
-      ${Object.keys(INDIVIDUAL_SERVICES).map(s=>`<option value="${s}" ${s===service?'selected':''}>${s} — ${money(INDIVIDUAL_SERVICES[s][vehicleType])}</option>`).join('')}
+      ${Object.keys(INDIVIDUAL_SERVICES).map(k=>`<option value="${k}" ${k===service?'selected':''}>${L(INDIVIDUAL_SERVICES[k].label)} — ${money(INDIVIDUAL_SERVICES[k].prices[vehicleType])}</option>`).join('')}
     </select>
-    <label style="margin-top:16px;">Add-Ons</label>
+    <label style="margin-top:16px;">${t('addons')}</label>
     ${renderAddonsBlock(addons, vehicleType)}
   </div>`;
 }
@@ -414,8 +566,8 @@ function renderIndividualCard(){
 function renderBoatCard(){
   return `
   <div class="card">
-    <h2>Boat Wash</h2>
-    <div class="info-banner">Boat Wash pricing is not published yet. This quote will show "Contact us for availability" — do not enter or promise a price.</div>
+    <h2>${t('boatTitle')}</h2>
+    <div class="info-banner">${t('boatInfo')}</div>
   </div>`;
 }
 
@@ -424,20 +576,22 @@ function renderFleetVehicleForm(){
   if(!d) return '';
   return `
   <div class="vehicle-card" style="border-color:var(--indigo);background:#F7F8FF;">
-    <div class="vtitle">New Vehicle</div>
-    <label>Vehicle Type</label>
+    <div class="vtitle">${t('newVehicle')}</div>
+    <label>${t('vehicleType')}</label>
     <select id="fv-type">
-      ${VEHICLE_TYPES.map((v,i)=>`<option value="${i}" ${i==d.type?'selected':''}>${v}</option>`).join('')}
+      ${L(VEHICLE_TYPE_LABELS).map((v,i)=>`<option value="${i}" ${i==d.type?'selected':''}>${v}</option>`).join('')}
     </select>
-    <label>Service</label>
+    <label>${t('makeModel')}</label>
+    <input type="text" id="fv-makemodel" value="${esc(d.makeModel)}" placeholder="${t('makeModelPh')}">
+    <label>${t('service')}</label>
     <select id="fv-service">
-      ${Object.keys(FLEET_SERVICES).map(s=>`<option value="${s}" ${s===d.service?'selected':''}>${s} — ${money(FLEET_SERVICES[s][d.type])}</option>`).join('')}
+      ${Object.keys(FLEET_SERVICES).map(k=>`<option value="${k}" ${k===d.service?'selected':''}>${L(FLEET_SERVICES[k].label)} — ${money(FLEET_SERVICES[k].prices[d.type])}</option>`).join('')}
     </select>
-    <label style="margin-top:14px;">Add-Ons for this vehicle</label>
+    <label style="margin-top:14px;">${t('addonsForVehicle')}</label>
     ${renderAddonsBlock(d.addons, d.type)}
     <div class="vcard-actions">
-      <button class="btn btn-outline btn-sm" data-action="cancel-vehicle-draft">Cancel</button>
-      <button class="btn btn-primary btn-sm" data-action="confirm-vehicle-draft">Add & Approve Vehicle</button>
+      <button class="btn btn-outline btn-sm" data-action="cancel-vehicle-draft">${t('cancel')}</button>
+      <button class="btn btn-primary btn-sm" data-action="confirm-vehicle-draft">${t('addApprove')}</button>
     </div>
   </div>`;
 }
@@ -451,44 +605,44 @@ function renderFleetCard(){
   const vehicleItems = state.fleet.vehicles.map((v,idx)=>`
     <div class="vehicle-card ${v.approved?'approved':''}">
       <div class="vtitle">
-        <span>${VEHICLE_TYPES[v.type]} #${idx+1} — ${v.service}</span>
-        <span class="badge ${v.approved?'approved':'draft'}">${v.approved?'APPROVED':'DRAFT'}</span>
+        <span>${L(VEHICLE_TYPE_LABELS)[v.type]} #${idx+1}${v.makeModel?' — '+esc(v.makeModel):''}<br><span style="font-weight:600;font-size:12px;color:var(--gray-600);">${L(FLEET_SERVICES[v.service].label)}</span></span>
+        <span class="badge ${v.approved?'approved':'draft'}">${v.approved?'✓':'…'}</span>
       </div>
-      <div class="vehicle-meta">${money(FLEET_SERVICES[v.service][v.type])} base ${Object.keys(v.addons).filter(k=>v.addons[k]).length ? '+ ' + Object.keys(v.addons).filter(k=>v.addons[k]).length + ' add-on(s)' : ''}</div>
+      <div class="vehicle-meta">${money(FLEET_SERVICES[v.service].prices[v.type])} ${Object.keys(v.addons).filter(k=>v.addons[k]).length ? '+ ' + Object.keys(v.addons).filter(k=>v.addons[k]).length : ''}</div>
       <div class="vcard-actions">
-        ${!v.approved ? `<button class="btn btn-outline btn-sm" data-action="approve-vehicle" data-id="${v.id}">Approve</button>` : ''}
-        <button class="btn btn-danger-outline btn-sm" data-action="remove-vehicle" data-id="${v.id}">Remove</button>
+        ${!v.approved ? `<button class="btn btn-outline btn-sm" data-action="approve-vehicle" data-id="${v.id}">${t('approve')}</button>` : ''}
+        <button class="btn btn-danger-outline btn-sm" data-action="remove-vehicle" data-id="${v.id}">${t('remove')}</button>
       </div>
     </div>
   `).join('');
 
   return `
   <div class="card">
-    <h2>Fleet Vehicles</h2>
+    <h2>${t('fleetVehicles')}</h2>
     <div class="fleet-progress">
-      <div class="count">${approvedCount}<small> / ${FLEET_MIN_VEHICLES} approved</small></div>
-      <div style="font-size:12px;color:var(--gray-600);font-weight:600;">${totalCount} total added</div>
+      <div class="count">${approvedCount}<small> / ${FLEET_MIN_VEHICLES} ${t('approvedOf')}</small></div>
+      <div style="font-size:12px;color:var(--gray-600);font-weight:600;">${totalCount} ${t('totalAdded')}</div>
     </div>
-    ${belowMin && !ov.active ? `<div class="warn-banner">Below ${FLEET_MIN_VEHICLES} approved vehicles: this quote stays a <b>draft</b>. Print, Email and marking as Sent are disabled until ${FLEET_MIN_VEHICLES} vehicles are approved, or Owner Override is used below.</div>` : ''}
-    ${belowMin && ov.active ? `<div class="warn-banner">Owner Override active — ${ov.name || '(no name entered)'}: "${ov.reason || '(no reason entered)'}". This is a simplified override with no real authentication. Full security arrives with Step 1 of the build plan.</div>` : ''}
+    ${belowMin && !ov.active ? `<div class="warn-banner">${t('belowMinWarn')(FLEET_MIN_VEHICLES)}</div>` : ''}
+    ${belowMin && ov.active ? `<div class="warn-banner" id="override-banner">${t('overrideActiveWarn')(ov.name, ov.reason)}</div>` : ''}
 
-    ${vehicleItems || '<div class="empty-state">No vehicles added yet.</div>'}
+    ${vehicleItems || `<div class="empty-state">${t('noVehicles')}</div>`}
     ${renderFleetVehicleForm()}
-    ${!state.activeVehicleDraft ? `<button class="btn btn-secondary" style="width:100%;margin-top:6px;" data-action="start-vehicle-draft">+ Add Vehicle</button>` : ''}
+    ${!state.activeVehicleDraft ? `<button class="btn btn-secondary" style="width:100%;margin-top:6px;" data-action="start-vehicle-draft">${t('addVehicle')}</button>` : ''}
   </div>
 
   ${belowMin ? `
   <div class="card">
-    <h2>Owner Override <span class="accent">(temporary, no real login)</span></h2>
+    <h2>${t('ownerOverride')} <span class="accent">${t('tempNoLogin')}</span></h2>
     <div class="checkbox-wrap" style="margin-bottom:10px;">
       <input type="checkbox" id="ov-active" ${ov.active?'checked':''}>
-      <span style="font-size:13px;font-weight:600;">Enable override to quote fewer than ${FLEET_MIN_VEHICLES} vehicles as fleet</span>
+      <span style="font-size:13px;font-weight:600;">${t('enableOverride')(FLEET_MIN_VEHICLES)}</span>
     </div>
     ${ov.active ? `
-      <label>Authorized by (José or Juan)</label>
+      <label>${t('authorizedBy')}</label>
       <input type="text" id="ov-name" value="${esc(ov.name)}" placeholder="Name">
-      <label>Reason</label>
-      <textarea id="ov-reason" rows="2" placeholder="Why this fleet quote needs fewer than ${FLEET_MIN_VEHICLES} vehicles">${esc(ov.reason)}</textarea>
+      <label>${t('reason')}</label>
+      <textarea id="ov-reason" rows="2" placeholder="${t('reasonPh')}">${esc(ov.reason)}</textarea>
     ` : ''}
   </div>` : ''}
   `;
@@ -497,32 +651,32 @@ function renderFleetCard(){
 function renderTaxCard(){
   return `
   <div class="card">
-    <h2>Tax</h2>
-    <label>Sales Tax Rate (%)</label>
-    <input type="number" id="tax-rate" step="0.01" min="0" value="${esc(state.tax.rate)}" placeholder="e.g. 9.75" ${state.tax.exempt?'disabled':''}>
+    <h2>${t('tax')}</h2>
+    <label>${t('taxRate')}</label>
+    <input type="number" id="tax-rate" step="0.01" min="0" value="${esc(state.tax.rate)}" placeholder="${t('taxRatePh')}" ${state.tax.exempt?'disabled':''}>
     <div class="checkbox-wrap" style="margin-top:12px;">
       <input type="checkbox" id="tax-exempt" ${state.tax.exempt?'checked':''}>
-      <span style="font-size:13px;font-weight:700;">Tax Exempt — Resale (dealer)</span>
+      <span style="font-size:13px;font-weight:700;">${t('taxExempt')}</span>
     </div>
-    ${state.tax.exempt ? `<div class="exempt-note">Only apply this if the dealer's resale certification (license # verified + resale confirmation) is signed and on file. Not automatic — you confirm this before sending.</div>` : ''}
-    <label style="margin-top:14px;">Manual Discount ($)</label>
+    ${state.tax.exempt ? `<div class="exempt-note">${t('exemptNote')}</div>` : ''}
+    <label style="margin-top:14px;">${t('manualDiscount')}</label>
     <input type="number" id="manual-discount" step="0.01" min="0" value="${esc(state.discount)}" placeholder="0.00">
   </div>`;
 }
 
 function renderTotalsCard(){
-  const t = calcTotals();
+  const tt = calcTotals();
   if(state.quoteType==='boat'){
-    return `<div class="card"><h2>Summary</h2><div class="info-banner">No pricing to calculate. Save or send this quote as a "Contact us for availability" note.</div></div>`;
+    return `<div class="card"><h2>${t('summary')}</h2><div class="info-banner">${t('boatNoCalc')}</div></div>`;
   }
   return `
   <div class="card">
-    <h2>Summary</h2>
-    <div class="totals-row"><span class="label">Subtotal</span><span>${money(t.subtotal)}</span></div>
-    ${state.quoteType==='fleet' && t.fleetDiscount ? `<div class="totals-row"><span class="label">Fleet Add-On Discount</span><span>-${money(t.fleetDiscount)}</span></div>` : ''}
-    ${t.discount ? `<div class="totals-row"><span class="label">Discount</span><span>-${money(t.discount)}</span></div>` : ''}
-    <div class="totals-row"><span class="label">Sales Tax ${state.tax.exempt?'(Exempt)':t.taxRate?'('+t.taxRate+'%)':''}</span><span>${money(t.tax)}</span></div>
-    <div class="totals-row total"><span class="label">Total</span><span>${money(t.total)}</span></div>
+    <h2>${t('summary')}</h2>
+    <div class="totals-row"><span class="label">${t('subtotal')}</span><span>${money(tt.subtotal)}</span></div>
+    ${state.quoteType==='fleet' && tt.fleetDiscount ? `<div class="totals-row"><span class="label">${t('fleetDiscount')}</span><span>-${money(tt.fleetDiscount)}</span></div>` : ''}
+    ${tt.discount ? `<div class="totals-row"><span class="label">${t('discount')}</span><span>-${money(tt.discount)}</span></div>` : ''}
+    <div class="totals-row"><span class="label">${t('salesTax')} ${state.tax.exempt?t('exempt'):tt.taxRate?'('+tt.taxRate+'%)':''}</span><span>${money(tt.tax)}</span></div>
+    <div class="totals-row total"><span class="label">${t('total')}</span><span>${money(tt.total)}</span></div>
   </div>`;
 }
 
@@ -530,42 +684,38 @@ function renderSavedQuotesCard(){
   const items = savedQuotes.slice().reverse().map(q=>`
     <div class="saved-item" data-action="open-saved" data-id="${q.id}">
       <div>
-        <div class="si-name">${esc(q.customer.name || 'Unnamed customer')}</div>
-        <div class="si-meta">${q.quoteType} · by ${AUTHOR_DISPLAY[q.createdBy]||q.createdBy || '—'} · ${new Date(q.savedAt).toLocaleDateString()}</div>
+        <div class="si-name">${esc(q.customer.name || 'Unnamed')}</div>
+        <div class="si-meta">${q.quoteType} · ${AUTHOR_DISPLAY[q.createdBy]||q.createdBy||'—'} · ${new Date(q.savedAt).toLocaleDateString()}</div>
       </div>
       <div class="si-total">${q.quoteType==='boat' ? '—' : money(q.total)}</div>
     </div>
   `).join('');
   return `
   <div class="card">
-    <h2>Saved Quotes <span class="accent">(shared)</span></h2>
-    ${items || '<div class="empty-state">No saved quotes yet.</div>'}
+    <h2>${t('savedQuotes')} <span class="accent">${t('shared')}</span></h2>
+    ${items || `<div class="empty-state">${t('noSaved')}</div>`}
   </div>`;
 }
 
-function esc(s){ return String(s==null?'':s).replace(/"/g,'&quot;').replace(/</g,'&lt;'); }
-
-/* ============ EVENT HANDLING ============ */
+/* ============ EVENTS ============ */
 function attachHandlers(){
-  document.querySelectorAll('[data-action]').forEach(el=>{
-    el.addEventListener('click', onAction);
-  });
+  document.querySelectorAll('[data-action]').forEach(el=> el.addEventListener('click', onAction));
   const bind = (id, evt, fn) => { const el = document.getElementById(id); if(el) el.addEventListener(evt, fn); };
   bind('cust-name','input', e=>{ state.customer.name = e.target.value; });
   bind('cust-contact','input', e=>{ state.customer.contact = e.target.value; });
   bind('cust-address','input', e=>{ state.customer.address = e.target.value; });
+  bind('cust-makemodel','input', e=>{ state.customer.makeModel = e.target.value; });
   bind('ind-vtype','change', e=>{ state.individual.vehicleType = Number(e.target.value); render(); });
   bind('ind-service','change', e=>{ state.individual.service = e.target.value; render(); });
   bind('fv-type','change', e=>{ state.activeVehicleDraft.type = Number(e.target.value); render(); });
+  bind('fv-makemodel','input', e=>{ state.activeVehicleDraft.makeModel = e.target.value; });
   bind('fv-service','change', e=>{ state.activeVehicleDraft.service = e.target.value; render(); });
   bind('tax-rate','input', e=>{ state.tax.rate = e.target.value; render(); });
   bind('tax-exempt','change', e=>{ state.tax.exempt = e.target.checked; render(); });
   bind('manual-discount','input', e=>{ state.discount = e.target.value; render(); });
   bind('ov-active','change', e=>{ state.fleet.override.active = e.target.checked; render(); });
-  bind('ov-name','input', e=>{ state.fleet.override.name = e.target.value; });
-  bind('ov-name','blur', ()=>{ render(); });
-  bind('ov-reason','input', e=>{ state.fleet.override.reason = e.target.value; });
-  bind('ov-reason','blur', ()=>{ render(); });
+  bind('ov-name','input', e=>{ state.fleet.override.name = e.target.value; updateOverrideBannerText(); });
+  bind('ov-reason','input', e=>{ state.fleet.override.reason = e.target.value; updateOverrideBannerText(); });
 
   document.querySelectorAll('[data-action="toggle-addon"]').forEach(el=>{
     el.addEventListener('change', e=>{
@@ -580,174 +730,227 @@ function attachHandlers(){
 function onAction(e){
   const el = e.currentTarget;
   const action = el.getAttribute('data-action');
-  if(action === 'set-author'){ state.createdBy = el.getAttribute('data-value'); render(); }
+  if(action === 'set-lang'){ state.lang = el.getAttribute('data-value'); render(); }
+  else if(action === 'set-author'){ state.createdBy = el.getAttribute('data-value'); render(); }
   else if(action === 'set-type'){ state.quoteType = el.getAttribute('data-value'); render(); }
   else if(action === 'set-radio-addon'){
     const group = el.getAttribute('data-group');
     const value = el.getAttribute('data-value');
     const target = state.activeVehicleDraft ? state.activeVehicleDraft.addons : state.individual.addons;
-    target[group+'_wash'] = false;
-    target[group+'_decon'] = false;
+    target[group+'_wash'] = false; target[group+'_decon'] = false;
     target[group+'_'+value] = true;
     render();
   }
   else if(action === 'start-vehicle-draft'){ state.activeVehicleDraft = emptyVehicleDraft(); render(); }
   else if(action === 'cancel-vehicle-draft'){ state.activeVehicleDraft = null; render(); }
   else if(action === 'confirm-vehicle-draft'){
-    const d = state.activeVehicleDraft;
-    d.approved = true;
-    state.fleet.vehicles.push(d);
-    state.activeVehicleDraft = null;
-    render();
+    const d = state.activeVehicleDraft; d.approved = true;
+    state.fleet.vehicles.push(d); state.activeVehicleDraft = null; render();
   }
   else if(action === 'approve-vehicle'){
-    const id = el.getAttribute('data-id');
-    const v = state.fleet.vehicles.find(v=>v.id===id);
-    if(v) v.approved = true;
-    render();
+    const v = state.fleet.vehicles.find(v=>v.id===el.getAttribute('data-id'));
+    if(v) v.approved = true; render();
   }
   else if(action === 'remove-vehicle'){
-    const id = el.getAttribute('data-id');
-    state.fleet.vehicles = state.fleet.vehicles.filter(v=>v.id!==id);
-    render();
+    state.fleet.vehicles = state.fleet.vehicles.filter(v=>v.id!==el.getAttribute('data-id')); render();
   }
   else if(action === 'open-saved'){
-    const id = el.getAttribute('data-id');
-    const q = savedQuotes.find(q=>q.id===id);
-    if(q && confirm('Load this saved quote? Unsaved changes to the current quote will be lost.')){
+    const q = savedQuotes.find(q=>q.id===el.getAttribute('data-id'));
+    if(q && confirm(t('confirmLoad'))){
+      const lang = state.lang;
       state = JSON.parse(JSON.stringify(q.state));
-      editingSavedId = q.id;
-      render();
+      state.lang = lang;
+      editingSavedId = q.id; render();
     }
   }
 }
 
 /* ============ VALIDATION ============ */
 function canFinalize(){
-  if(state.quoteType === 'boat') return true;
-  if(state.quoteType === 'individual') return true;
-  if(state.quoteType === 'fleet'){
-    const approvedCount = state.fleet.vehicles.filter(v=>v.approved).length;
-    if(approvedCount >= FLEET_MIN_VEHICLES) return true;
-    if(state.fleet.override.active && state.fleet.override.name.trim() && state.fleet.override.reason.trim()) return true;
-    return false;
-  }
-  return true;
+  if(state.quoteType !== 'fleet') return true;
+  const approvedCount = state.fleet.vehicles.filter(v=>v.approved).length;
+  if(approvedCount >= FLEET_MIN_VEHICLES) return true;
+  if(state.fleet.override.active && state.fleet.override.name.trim() && state.fleet.override.reason.trim()) return true;
+  return false;
 }
 
 /* ============ SAVE ============ */
 async function handleSave(){
-  if(!state.createdBy){ alert('Please select who created this quote (José or Juan) before saving.'); return; }
-  const t = calcTotals();
+  if(!state.createdBy){ alert(t('selectAuthorFirst')); return; }
+  const tt = calcTotals();
   const record = {
-    id: editingSavedId || newId(),
-    createdBy: state.createdBy,
-    quoteType: state.quoteType,
-    customer: state.customer,
-    total: t.total,
-    savedAt: new Date().toISOString(),
+    id: editingSavedId || newId(), createdBy: state.createdBy, quoteType: state.quoteType,
+    customer: state.customer, total: tt.total, savedAt: new Date().toISOString(),
     state: JSON.parse(JSON.stringify(state)),
   };
   const idx = savedQuotes.findIndex(q=>q.id===record.id);
   if(idx>=0) savedQuotes[idx] = record; else savedQuotes.push(record);
   await persistSavedQuotes();
-  editingSavedId = record.id;
-  render();
-  alert('Quote saved.');
+  editingSavedId = record.id; render();
+  showToast(t('quoteSaved'));
 }
 
-/* ============ PRINT PREVIEW ============ */
-function buildPreviewHTML(){
-  const t = calcTotals();
-  const today = new Date().toLocaleDateString('en-US');
-  const rows = (t.lines||[]).map(l=>`
-    <tr>
-      <td>${esc(l.label)}</td>
-      <td>${esc(l.vehicle)}</td>
-      <td class="amt">${l.amount!=null ? money(l.amount) : (l.note||'')}</td>
-    </tr>
-  `).join('');
+/* ============ PDF GENERATION (jsPDF) ============ */
+function generatePdfDoc(){
+  const { jsPDF } = window.jspdf;
+  const doc = new jsPDF({unit:'pt', format:'letter'});
+  const pageWidth = doc.internal.pageSize.getWidth();
+  const navy = [1,3,62], indigo=[0,51,255], gray=[91,93,116], grayLight=[228,229,238];
+  const tt = calcTotals();
+  const today = new Date().toLocaleDateString(state.lang==='es'?'es-MX':'en-US');
 
-  const summaryHtml = state.quoteType==='boat' ? '' : `
-    <div class="pv-summary">
-      <div class="row"><span>Subtotal</span><span>${money(t.subtotal)}</span></div>
-      ${state.quoteType==='fleet' && t.fleetDiscount ? `<div class="row"><span>Fleet Add-On Discount</span><span>-${money(t.fleetDiscount)}</span></div>` : ''}
-      ${t.discount ? `<div class="row"><span>Discount</span><span>-${money(t.discount)}</span></div>` : ''}
-      <div class="row"><span>Sales Tax ${state.tax.exempt?'(Exempt — Resale)':''}</span><span>${money(t.tax)}</span></div>
-      <div class="row total"><span>Total</span><span>${money(t.total)}</span></div>
-    </div>
-  `;
+  // header
+  doc.setFillColor(...navy); doc.rect(0,0,pageWidth,86,'F');
+  doc.setFillColor(...indigo); doc.rect(0,86,pageWidth,4,'F');
+  doc.setTextColor(255,255,255);
+  doc.setFont('helvetica','bold'); doc.setFontSize(9);
+  doc.text(t('pvTag').toUpperCase(), 40, 30);
+  doc.setFontSize(20);
+  doc.text('Aquaman Services', 40, 54);
+  doc.setFont('helvetica','normal'); doc.setFontSize(10);
+  doc.text(t('pvTagline'), 40, 72);
 
-  return `
-    <div class="pv-header">
-      <div class="pv-tag">Estimate — Not an Invoice</div>
-      <h1>Aquaman Services</h1>
-      <div class="pv-sub">Professional detailing, down to the last detail.</div>
-    </div>
-    <div class="pv-diag"></div>
-    <div class="pv-body">
-      <div class="pv-cols">
-        <div class="pv-col">
-          <h3>Prepared For</h3>
-          <p><b>${esc(state.customer.name||'—')}</b><br>${esc(state.customer.contact||'')}<br>${esc(state.customer.address||'')}</p>
-        </div>
-        <div class="pv-col" style="text-align:right;">
-          <h3>Date</h3>
-          <p>${today}</p>
-          <h3 style="margin-top:12px;">Prepared By</h3>
-          <p>${esc(AUTHOR_DISPLAY[state.createdBy]||state.createdBy||'—')} · Aquaman Services</p>
-        </div>
-      </div>
-      ${state.quoteType==='boat' ? `<p style="font-size:14px;">Boat Wash — <b>Contact us for availability.</b> Pricing provided upon request.</p>` : `
-      <table class="pv-table">
-        <tr><th>Service / Add-On</th><th>Vehicle</th><th style="text-align:right;">Amount</th></tr>
-        ${rows}
-      </table>
-      ${summaryHtml}
-      `}
-      <div class="pv-footnote">
-        Appointments are confirmed based on availability. Submitting or receiving this estimate does not reserve an appointment.<br>
-        (901) 340-9733 · aquamanservicesllc.com
-      </div>
-    </div>
-  `;
-}
+  // customer / date block
+  let y = 116;
+  doc.setTextColor(...gray); doc.setFont('helvetica','bold'); doc.setFontSize(8);
+  doc.text(t('preparedFor').toUpperCase(), 40, y);
+  doc.text(t('date').toUpperCase(), pageWidth-160, y);
+  doc.setTextColor(20,20,40); doc.setFont('helvetica','normal'); doc.setFontSize(10.5);
+  doc.text(state.customer.name || '—', 40, y+16);
+  doc.text(today, pageWidth-160, y+16);
+  let y2 = y+16;
+  if(state.customer.contact){ y2+=14; doc.text(state.customer.contact, 40, y2); }
+  if(state.customer.address){ y2+=14; doc.text(state.customer.address, 40, y2); }
+  if(state.customer.makeModel){ y2+=14; doc.text(state.customer.makeModel, 40, y2); }
+  doc.setTextColor(...gray); doc.setFont('helvetica','bold'); doc.setFontSize(8);
+  doc.text(t('preparedBy').toUpperCase(), pageWidth-160, y+32);
+  doc.setTextColor(20,20,40); doc.setFont('helvetica','normal'); doc.setFontSize(10.5);
+  doc.text((AUTHOR_DISPLAY[state.createdBy]||state.createdBy||'—') + ' · Aquaman Services', pageWidth-160, y+48);
 
-function handlePrint(){
-  if(!state.createdBy){ alert('Please select who created this quote (José or Juan) first.'); return; }
-  if(!canFinalize()){ alert('This fleet quote has fewer than '+FLEET_MIN_VEHICLES+' approved vehicles. Enable and complete Owner Override, or approve more vehicles, before printing.'); return; }
-  document.getElementById('print-area').innerHTML = buildPreviewHTML();
-  window.print();
-}
+  let curY = Math.max(y2, y+64) + 20;
 
-/* ============ EMAIL ============ */
-function buildMailto(){
-  const t = calcTotals();
-  const subject = 'Aquaman Services — Estimate for ' + (state.customer.name || 'Customer');
-  let body = 'ESTIMATE — Not an Invoice\nAquaman Services\nProfessional detailing, down to the last detail.\n\n';
-  body += 'Prepared for: ' + (state.customer.name||'—') + '\n';
-  body += 'Contact: ' + (state.customer.contact||'—') + '\n\n';
-  if(state.quoteType==='boat'){
-    body += 'Boat Wash — Contact us for availability.\n';
+  if(state.quoteType === 'boat'){
+    doc.setFontSize(11); doc.setTextColor(20,20,40);
+    doc.text(doc.splitTextToSize(t('boatContact'), pageWidth-80), 40, curY);
+    curY += 40;
   } else {
-    (t.lines||[]).forEach(l=>{
-      body += '- ' + l.label + ' (' + l.vehicle + '): ' + (l.amount!=null?money(l.amount):(l.note||'')) + '\n';
+    const rows = tt.lines.map(l => [
+      l.desc ? (l.label + '\n' + l.desc) : l.label,
+      l.vehicle,
+      l.amount!=null ? money(l.amount) : ''
+    ]);
+    doc.autoTable({
+      startY: curY,
+      head: [[t('serviceAddon'), t('vehicle'), t('amount')]],
+      body: rows,
+      theme: 'plain',
+      margin:{left:40,right:40},
+      styles:{font:'helvetica', fontSize:9.5, cellPadding:{top:6,bottom:6,left:0,right:6}, textColor:[20,20,40]},
+      headStyles:{textColor:gray, fontStyle:'bold', fontSize:8, lineWidth:{bottom:1}, lineColor:grayLight},
+      columnStyles:{0:{cellWidth:280},1:{cellWidth:150},2:{cellWidth:'auto', halign:'right', fontStyle:'bold'}},
+      didParseCell: function(data){
+        if(data.row.section==='body' && data.column.index===0){
+          data.cell.styles.fontStyle = 'normal';
+        }
+      },
     });
-    body += '\nSubtotal: ' + money(t.subtotal) + '\n';
-    if(state.quoteType==='fleet' && t.fleetDiscount) body += 'Fleet Add-On Discount: -' + money(t.fleetDiscount) + '\n';
-    if(t.discount) body += 'Discount: -' + money(t.discount) + '\n';
-    body += 'Sales Tax' + (state.tax.exempt?' (Exempt — Resale)':'') + ': ' + money(t.tax) + '\n';
-    body += 'TOTAL: ' + money(t.total) + '\n';
+    curY = doc.lastAutoTable.finalY + 16;
+
+    // Summary
+    const summaryX = pageWidth - 220;
+    doc.setDrawColor(...grayLight); doc.line(summaryX, curY, pageWidth-40, curY);
+    curY += 14;
+    const sumRow = (label, val, bold)=>{
+      doc.setFont('helvetica', bold?'bold':'normal'); doc.setFontSize(bold?12:10);
+      doc.setTextColor(bold?navy[0]:gray[0], bold?navy[1]:gray[1], bold?navy[2]:gray[2]);
+      doc.text(label, summaryX, curY);
+      doc.setTextColor(20,20,40);
+      doc.text(val, pageWidth-40, curY, {align:'right'});
+      curY += bold?20:16;
+    };
+    sumRow(t('subtotal'), money(tt.subtotal));
+    if(state.quoteType==='fleet' && tt.fleetDiscount) sumRow(t('fleetDiscount'), '-'+money(tt.fleetDiscount));
+    if(tt.discount) sumRow(t('discount'), '-'+money(tt.discount));
+    sumRow(t('salesTax') + (state.tax.exempt?' '+t('exemptResale'):''), money(tt.tax));
+    doc.setDrawColor(...grayLight); doc.line(summaryX, curY-4, pageWidth-40, curY-4);
+    curY += 6;
+    sumRow(t('total'), money(tt.total), true);
+    curY += 10;
+
+    // What's included
+    const blocks = uniqueIncludesBlocks(tt.lines);
+    if(blocks.length){
+      curY += 10;
+      blocks.forEach(b=>{
+        if(curY > 680){ doc.addPage(); curY = 50; }
+        doc.setFont('helvetica','bold'); doc.setFontSize(10); doc.setTextColor(...navy);
+        doc.text(t('whatsIncluded') + ' — ' + b.label, 40, curY);
+        curY += 14;
+        doc.setFont('helvetica','normal'); doc.setFontSize(9); doc.setTextColor(60,60,80);
+        b.includes.forEach(inc=>{
+          const wrapped = doc.splitTextToSize('•  ' + inc, pageWidth-90);
+          if(curY > 700){ doc.addPage(); curY = 50; }
+          doc.text(wrapped, 46, curY);
+          curY += wrapped.length*12 + 3;
+        });
+        curY += 8;
+      });
+    }
   }
-  body += '\nAppointments are confirmed based on availability. This estimate does not reserve an appointment.\n';
-  body += '(901) 340-9733 · aquamanservicesllc.com';
-  return 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+
+  // footer
+  if(curY > 730){ doc.addPage(); curY = 60; }
+  doc.setDrawColor(...grayLight); doc.line(40, curY, pageWidth-40, curY);
+  curY += 16;
+  doc.setFont('helvetica','normal'); doc.setFontSize(8.5); doc.setTextColor(...gray);
+  doc.text(doc.splitTextToSize(t('footnote'), pageWidth-80), 40, curY);
+  curY += 24;
+  doc.text('(901) 340-9733 · aquamanservicesllc.com', 40, curY);
+
+  return doc;
 }
 
-function handleEmail(){
-  if(!state.createdBy){ alert('Please select who created this quote (José or Juan) first.'); return; }
-  if(!canFinalize()){ alert('This fleet quote has fewer than '+FLEET_MIN_VEHICLES+' approved vehicles. Enable and complete Owner Override, or approve more vehicles, before emailing.'); return; }
-  window.location.href = buildMailto();
+function pdfFilename(){
+  const name = (state.customer.name || 'estimate').replace(/[^a-z0-9]+/gi,'-').toLowerCase();
+  return `aquaman-estimate-${name}.pdf`;
+}
+
+/* ============ PDF BUTTON (download) ============ */
+function handlePrint(){
+  if(!state.createdBy){ alert(t('selectAuthorFirst2')); return; }
+  if(!canFinalize()){ alert(t('belowMinBlock')(FLEET_MIN_VEHICLES)); return; }
+  const doc = generatePdfDoc();
+  doc.save(pdfFilename());
+}
+
+/* ============ EMAIL (native share with attached PDF, fallback to mailto) ============ */
+async function handleEmail(){
+  if(!state.createdBy){ alert(t('selectAuthorFirst2')); return; }
+  if(!canFinalize()){ alert(t('belowMinBlock')(FLEET_MIN_VEHICLES)); return; }
+
+  const doc = generatePdfDoc();
+  const blob = doc.output('blob');
+  const filename = pdfFilename();
+  const subject = 'Aquaman Services — Estimate for ' + (state.customer.name || 'Customer');
+  const introText = t('emailIntro')(state.customer.name);
+
+  let shared = false;
+  try{
+    const file = new File([blob], filename, {type:'application/pdf'});
+    if(navigator.canShare && navigator.canShare({files:[file]})){
+      await navigator.share({files:[file], title:t('pdfShareTitle'), text: subject + '\n\n' + introText});
+      shared = true;
+    }
+  }catch(err){
+    if(err && err.name === 'AbortError'){ shared = true; } // user cancelled share sheet, don't fall back
+  }
+
+  if(!shared){
+    doc.save(filename);
+    const body = t('emailIntroNoAttach')(state.customer.name) + '\n\n' + subject;
+    const mailto = 'mailto:?subject=' + encodeURIComponent(subject) + '&body=' + encodeURIComponent(body);
+    window.location.href = mailto;
+  }
 }
 
 /* ============ INIT ============ */
